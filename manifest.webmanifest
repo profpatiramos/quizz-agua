@@ -1,0 +1,11 @@
+{
+  "name": "Sou Consciente da Água?",
+  "short_name": "Consciência da Água",
+  "description": "Quiz educativo offline sobre hábitos conscientes de uso da água.",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#dff8f6",
+  "theme_color": "#0b7285",
+  "icons": [{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}

@@ -1,0 +1,13 @@
+MINIAPP — SOU CONSCIENTE DA ÁGUA?
+
+Arquivos: index.html, manifest.webmanifest, sw.js e icon.svg.
+
+USAR NO IPAD
+1. Publique esta pasta em um endereço HTTPS (por exemplo, o endereço de um site institucional).
+2. Abra o endereço no Safari enquanto estiver conectado à internet uma vez, para o cache offline ser preparado.
+3. Toque em Compartilhar > Adicionar à Tela de Início.
+4. Abra pelo novo ícone. O quiz pode ser usado sem internet depois do primeiro carregamento.
+
+Também é possível abrir o index.html diretamente em um computador para demonstração. O modo instalável/offline completo depende de HTTPS e do primeiro acesso online para registrar o cache.
+
+O miniapp não coleta dados pessoais, não usa login e mantém as respostas apenas durante a rodada atual.

@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b7285">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Consciência da Água">
+  <meta name="description" content="Quiz educativo offline sobre hábitos conscientes de uso da água.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <title>Sou Consciente da Água?</title>
+  <style>
+    :root {
+      --ink: #12323a;
+      --muted: #58747b;
+      --deep: #075985;
+      --teal: #0b7285;
+      --aqua: #35c4c9;
+      --mint: #e8fbf8;
+      --sky: #e5f5ff;
+      --white: #fff;
+      --line: rgba(7, 89, 133, .14);
+      --shadow: 0 18px 50px rgba(4, 57, 73, .16);
+    }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(135deg, #dff8f6 0%, #edf8ff 48%, #d5efff 100%);
+      font-family: ui-rounded, "Avenir Next", "Trebuchet MS", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button { font: inherit; }
+    .app-shell {
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: max(22px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .app-shell::before, .app-shell::after {
+      content: ""; position: absolute; border-radius: 50%; pointer-events: none;
+      filter: blur(2px); opacity: .55;
+    }
+    .app-shell::before { width: 360px; height: 360px; background: #b8eee8; top: -160px; right: -100px; }
+    .app-shell::after { width: 260px; height: 260px; background: #bfe6ff; bottom: -130px; left: -80px; }
+    .card {
+      position: relative; z-index: 1; width: min(100%, 720px); min-height: min(720px, calc(100vh - 42px));
+      border: 1px solid rgba(255,255,255,.82); border-radius: 32px; background: rgba(255,255,255,.86);
+      box-shadow: var(--shadow); backdrop-filter: blur(16px); padding: clamp(24px, 5vw, 48px);
+      display: flex; flex-direction: column;
+    }
+    .view { display: none; flex: 1; flex-direction: column; }
+    .view.active { display: flex; animation: appear .35s ease both; }
+    @keyframes appear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--teal); font-weight: 800; letter-spacing: .04em; font-size: .92rem; text-transform: uppercase; }
+    .drop { width: 34px; height: 34px; display: grid; place-items: center; color: white; background: var(--teal); border-radius: 13px 13px 13px 4px; transform: rotate(-12deg); }
+    .drop span { transform: rotate(12deg); }
+    h1 { margin: 26px 0 12px; color: var(--deep); font-size: clamp(2.3rem, 7vw, 4.3rem); line-height: .98; letter-spacing: -.045em; max-width: 620px; }
+    h2 { margin: 30px 0 0; font-size: clamp(1.75rem, 5vw, 3rem); line-height: 1.13; letter-spacing: -.035em; }
+    .lead { margin: 0; color: var(--muted); font-size: clamp(1.08rem, 2.5vw, 1.3rem); line-height: 1.5; max-width: 540px; }
+    .start-view { justify-content: space-between; }
+    .start-art { margin: 30px 0 38px; padding: 24px; border-radius: 22px; color: var(--deep); background: linear-gradient(120deg, var(--mint), var(--sky)); border: 1px solid rgba(53,196,201,.22); }
+    .start-art p { margin: 0; font-weight: 700; font-size: 1.1rem; }
+    .start-art small { display: block; margin-top: 7px; color: var(--muted); font-size: .96rem; }
+    .primary, .choice, .secondary { border: 0; cursor: pointer; touch-action: manipulation; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }
+    .primary:active, .choice:active, .secondary:active { transform: scale(.98); }
+    .primary { width: 100%; padding: 20px 24px; border-radius: 18px; background: var(--teal); color: white; font-weight: 800; font-size: 1.18rem; letter-spacing: .07em; box-shadow: 0 10px 20px rgba(11,114,133,.25); }
+    .primary:hover { background: #095f70; box-shadow: 0 14px 25px rgba(11,114,133,.3); }
+    .quiz-view { gap: 26px; }
+    .quiz-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .counter { color: var(--muted); font-size: 1rem; font-weight: 700; }
+    .counter strong { color: var(--deep); }
+    .progress { height: 12px; width: 100%; border-radius: 100px; background: #dbeef1; overflow: hidden; }
+    .progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--teal), var(--aqua)); transition: width .35s ease; }
+    .question-area { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .question-emoji { font-size: clamp(2.7rem, 9vw, 4.5rem); line-height: 1; }
+    .question-area h2 { max-width: 620px; }
+    .choice-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .choice { min-height: 92px; border-radius: 20px; font-size: 1.28rem; font-weight: 900; letter-spacing: .07em; }
+    .choice.yes { background: #d5f8ec; color: #14724b; box-shadow: inset 0 0 0 2px rgba(20,114,75,.12); }
+    .choice.no { background: #e2f1ff; color: #12618d; box-shadow: inset 0 0 0 2px rgba(18,97,141,.12); }
+    .choice:hover { transform: translateY(-2px); }
+    .back { align-self: flex-start; padding: 8px 0; background: none; color: var(--muted); font-weight: 700; border: 0; cursor: pointer; }
+    .back:disabled { opacity: .35; cursor: default; }
+    .result-view { justify-content: center; text-align: center; align-items: center; }
+    .result-badge { width: 130px; height: 130px; display: grid; place-items: center; margin-bottom: 24px; border-radius: 50%; background: linear-gradient(135deg, var(--teal), var(--aqua)); color: white; box-shadow: 0 12px 24px rgba(11,114,133,.25); }
+    .result-badge strong { display: block; font-size: 3rem; line-height: .9; }
+    .result-badge span { display: block; margin-top: 8px; font-size: .85rem; font-weight: 800; letter-spacing: .05em; }
+    .result-view h2 { margin: 0; max-width: 560px; color: var(--deep); }
+    .result-view .lead { margin: 16px auto 34px; }
+    .result-view .primary { max-width: 430px; }
+    .footer-note { margin-top: 22px; text-align: center; color: #6b858a; font-size: .8rem; }
+    :focus-visible { outline: 4px solid rgba(53,196,201,.65); outline-offset: 3px; }
+    @media (max-width: 520px) {
+      .card { min-height: calc(100dvh - 22px); border-radius: 24px; padding: 24px 20px; }
+      h1 { margin-top: 20px; }
+      .start-art { margin: 24px 0; }
+      .quiz-view { gap: 18px; }
+      .choice { min-height: 78px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <section class="card" aria-live="polite">
+      <div id="startView" class="view start-view active">
+        <div>
+          <div class="brand"><span class="drop"><span>💧</span></span> Educação para cuidar</div>
+          <h1>Sou Consciente da Água?</h1>
+          <p class="lead">Responda Sim ou Não e descubra!</p>
+          <div class="start-art"><p>Pequenas escolhas protegem um recurso enorme.</p><small>São 10 perguntas rápidas sobre o seu dia a dia.</small></div>
+        </div>
+        <div><button id="startButton" class="primary" type="button">COMEÇAR</button><div class="footer-note">Sem cadastro · funciona offline</div></div>
+      </div>
+
+      <div id="quizView" class="view quiz-view">
+        <div class="quiz-top"><button id="backButton" class="back" type="button">← Voltar</button><div class="counter">Pergunta <strong id="currentNumber">1</strong> de 10</div></div>
+        <div class="progress" role="progressbar" aria-label="Progresso do quiz" aria-valuemin="0" aria-valuemax="10" aria-valuenow="1"><span id="progressBar" style="width:10%"></span></div>
+        <div class="question-area"><div id="questionEmoji" class="question-emoji" aria-hidden="true">🚿</div><h2 id="questionText"></h2></div>
+        <div class="choice-row"><button id="yesButton" class="choice yes" type="button">SIM</button><button id="noButton" class="choice no" type="button">NÃO</button></div>
+      </div>
+
+      <div id="resultView" class="view result-view">
+        <div class="result-badge"><div><strong id="scoreNumber">0</strong><span>DE 10 SIM</span></div></div>
+        <h2 id="resultTitle">Excelente!</h2><p id="resultMessage" class="lead"></p><button id="restartButton" class="primary" type="button">RESPONDER NOVAMENTE</button>
+      </div>
+    </section>
+  </main>
+  <script>
+    const questions = [
+      ['🚿', 'Você fecha a torneira enquanto escova os dentes?'],
+      ['💧', 'Você evita deixar a torneira aberta sem necessidade?'],
+      ['🚿', 'Você toma banhos rápidos?'],
+      ['🌧️', 'Você aproveita a água da chuva?'],
+      ['🪣', 'Você usa balde em vez de mangueira para lavar áreas?'],
+      ['🚗', 'Você evita lavar o carro com a mangueira aberta?'],
+      ['🌱', 'Você evita desperdiçar água ao regar as plantas?'],
+      ['🔧', 'Você avisa quando percebe um vazamento de água?'],
+      ['🧼', 'Você fecha a torneira enquanto ensaboa as mãos?'],
+      ['🌍', 'Você acha importante economizar água?']
+    ];
+    const state = { index: 0, answers: Array(questions.length).fill(null) };
+    const views = { start: document.querySelector('#startView'), quiz: document.querySelector('#quizView'), result: document.querySelector('#resultView') };
+    const $ = (s) => document.querySelector(s);
+    function show(view) { Object.values(views).forEach(v => v.classList.remove('active')); views[view].classList.add('active'); }
+    function renderQuestion() {
+      const [emoji, text] = questions[state.index];
+      $('#questionEmoji').textContent = emoji; $('#questionText').textContent = text;
+      $('#currentNumber').textContent = state.index + 1; $('#progressBar').style.width = `${(state.index + 1) * 10}%`;
+      $('#quizView .progress').setAttribute('aria-valuenow', state.index + 1);
+      $('#backButton').disabled = state.index === 0;
+      $('#yesButton').focus({ preventScroll: true });
+    }
+    function start() { state.index = 0; state.answers.fill(null); show('quiz'); renderQuestion(); }
+    function answer(value) {
+      state.answers[state.index] = value;
+      if (state.index < questions.length - 1) { state.index += 1; renderQuestion(); }
+      else renderResult();
+    }
+    function back() { if (state.index > 0) { state.index -= 1; show('quiz'); renderQuestion(); } }
+    function renderResult() {
+      const score = state.answers.filter(Boolean).length; $('#scoreNumber').textContent = score;
+      let message = '';
+      if (score >= 9) message = 'Excelente! Você é superconsciente no uso da água!';
+      else if (score >= 7) message = 'Muito bem! Seus hábitos ajudam a preservar a água.';
+      else if (score >= 4) message = 'Você está no caminho certo, mas ainda pode melhorar alguns hábitos.';
+      else message = 'Que tal começar hoje? Pequenas atitudes fazem uma grande diferença.';
+      $('#resultMessage').textContent = message; show('result'); $('#restartButton').focus({ preventScroll: true });
+    }
+    $('#startButton').addEventListener('click', start); $('#restartButton').addEventListener('click', start);
+    $('#yesButton').addEventListener('click', () => answer(true)); $('#noButton').addEventListener('click', () => answer(false)); $('#backButton').addEventListener('click', back);
+    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  </script>
+</body>
+</html>
