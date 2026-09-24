@@ -167,12 +167,18 @@
     function back() { if (state.index > 0) { state.index -= 1; show('quiz'); renderQuestion(); } }
     function renderResult() {
       const score = state.answers.filter(Boolean).length; $('#scoreNumber').textContent = score;
-      let message = '';
-      if (score >= 9) message = 'Excelente! Você é superconsciente no uso da água!';
-      else if (score >= 7) message = 'Muito bem! Seus hábitos ajudam a preservar a água.';
-      else if (score >= 4) message = 'Você está no caminho certo, mas ainda pode melhorar alguns hábitos.';
-      else message = 'Que tal começar hoje? Pequenas atitudes fazem uma grande diferença.';
-      $('#resultMessage').textContent = message; show('result'); $('#restartButton').focus({ preventScroll: true });
+      let title = '', message = '';
+      if (score >= 8) {
+        title = 'Excelente!';
+        message = 'Você é superconsciente no uso da água!';
+      } else if (score >= 5) {
+        title = 'Muito Bom!';
+        message = 'Seus hábitos ajudam a preservar a água.';
+      } else {
+        title = 'Precisa melhorar!';
+        message = 'Pequenas atitudes fazem uma grande diferença. Que tal começar hoje?';
+      }
+      $('#resultTitle').textContent = title; $('#resultMessage').textContent = message; show('result'); $('#restartButton').focus({ preventScroll: true });
     }
     $('#startButton').addEventListener('click', start); $('#restartButton').addEventListener('click', start);
     $('#yesButton').addEventListener('click', () => answer(true)); $('#noButton').addEventListener('click', () => answer(false)); $('#backButton').addEventListener('click', back);
